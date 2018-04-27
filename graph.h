@@ -71,3 +71,4 @@ class graph{
         vertex ** adj_list;
         int size;
 };
+

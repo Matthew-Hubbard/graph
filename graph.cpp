@@ -31,7 +31,12 @@ vertex::~vertex()
         delete [] location;
         location = NULL;
     }
-    remove_list();
+    if(head)
+    {
+        remove_list();
+        //delete head;
+        head = NULL;
+    }
 }
 
 int vertex::remove_list()
@@ -147,7 +152,7 @@ edge::edge():distance(1), speed_limit(25), adjacent(NULL), next(NULL)
 
 edge::edge(const edge & copy_from):next(NULL)
 {
-    adjacent = new vertex(*copy_from.adjacent);
+    adjacent = copy_from.adjacent;
     next = copy_from.next;
     distance = copy_from.distance;
     speed_limit = copy_from.speed_limit;
@@ -156,14 +161,13 @@ edge::edge(const edge & copy_from):next(NULL)
 edge::edge(vertex & adjacent, int distance, int speed_limit):distance(distance),
     speed_limit(speed_limit), next(NULL)
 {
-    this->adjacent = &adjacent; 
-}
+    this->adjacent = &adjacent; }
 
 edge::~edge()
 {
     if(adjacent)
     {
-        delete adjacent;
+        //delete adjacent;
         adjacent = NULL;
     }
     next = NULL;
@@ -212,6 +216,7 @@ graph::~graph()
         else
             break;
     }
+    delete adj_list;
     /*
     if(adj_list)
         delete adj_list;
@@ -252,14 +257,17 @@ int graph::connect(char * connect_from, char * connect_to, int distance,
         int speed_limit)
 {
     //add connect_to to connect_from's edge list
-    //vertex v_from;
-    //vertex v_to;
     int key_from = find_location(connect_from); 
     int key_to = find_location(connect_to); 
     if(key_from == 999 || key_to == 999)
         return 0;
+
     edge * edge_to_insert = new edge(*adj_list[key_to], distance, speed_limit);
+
     adj_list[key_from]->insert_edge(edge_to_insert);
+
+    if(edge_to_insert)
+        delete edge_to_insert;
     return 1;
 }
 
@@ -268,6 +276,9 @@ int graph::connect(int connect_from, int connect_to,
 {
     edge * edge_to_insert = new edge(*adj_list[connect_to], distance, speed_limit);
     adj_list[connect_from]->insert_edge(edge_to_insert);
+
+    if(edge_to_insert)
+        delete edge_to_insert;
     return 1;
 }
 
@@ -314,6 +325,16 @@ int graph::load2()
         strcat(location, num);
         a_vertex = new vertex(location); 
         add_vertex(a_vertex);
+        if(a_vertex)
+        {
+            delete a_vertex;
+            a_vertex = NULL;
+        }
+        if(location)
+        {
+            delete [] location;
+            a_vertex = NULL;
+        }
     }
 
     connect(0,1, rand() % 70 + 15, rand() % 20 + 1);
@@ -327,6 +348,10 @@ int graph::load2()
         connect(i,i - 1, rand() % 70 + 15, rand() % 20 + 1);
         connect(i,(rand() % 19), rand() % 70 + 15, rand() % 20 + 1);
     }
+    if(location)
+        delete [] location;
+    if(a_vertex)
+        delete [] a_vertex;
 }
 
 int graph::load()
