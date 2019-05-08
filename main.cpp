@@ -129,3 +129,4 @@ int get_location(char *& location)
     strcpy(location, temp);
     return 1;
 }
+//test
